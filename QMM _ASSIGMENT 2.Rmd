@@ -1,0 +1,129 @@
+---
+title: "QMM ASSIGNMET 2"
+author: "SRIKANTH CHETLAPALLY"
+date: "2023-09-24"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r}
+table=matrix(c(420,750,13000,20,900,360,900,12000,15,1200,300,450,5000,12,750),ncol=5, byrow=T)
+colnames(table)=c('PROFIT','EXCESS CAP','STORAGE','UNIT','SALES')
+rownames(table)=c('large','medium','small')
+table
+```
+
+No of large units produced at plant1: D_l1
+No of medium units produced at plant1: D_m1
+No of small units produced at plant1: D_s1
+No of large units produced at plant1: D_l2
+No of medium units produced at plant1: D_m2
+No of small units produced at plant1: D_s2
+No of large units produced at plant1: D_l3
+No of medium units produced at plant1: D_m3
+No of small units produced at plant1: D_s3
+
+Objective function:
+
+$$ MAX \hspace{.3cm} Z = 420(D_l1+D_m2+D_s3)+360(D_l1+D_m2+D_s3)+300(D_l1+D_m2+D_s3)$$
+
+Constraints
+
+Production capacity constraints:
+
+The production of each size at each plant should not exceed the respective plants capacity
+excess capacity for each plant is 750, 900 and 400 units per day.
+
+$$D_l1+D_m1+D_s1 \le 750$$
+
+$$D_l2+D_m2+D_s2 \le 900$$
+
+$$D_l3+D_m3+D_s3 \le 450$$
+
+Storage space restrictions at present: the production of ecah size at each plant should not exceed the available in process storage space
+
+
+
+$$20D_l1+15D_m1+12D_s1 \le 13000$$
+
+$$20D_l2+15D_m2+12D_s2 \le 12000$$
+
+$$20D_l3+15D_m3+12D_s3 \le 5000$$
+
+
+Demand constraint:
+
+The production of each size meet the scale forecast.
+
+$$D_l1+D_m1+D_s1 \le 900$$
+
+$$D_l2+D_m2+D_12 \le 1200$$
+
+$$D_l3+D_m3+D_s3 \le 750$$
+
+Restrictions on layoffs of employees:
+
+$$(D_l1+D_m1+D_s1)/750 = (D_l2+D_m2+D_s2)/900 = (D_l3+D_m3+D_s3)/450$$
+
+Non negativity constraints:
+
+$$Dl>0,Dm > 0,Ds > 0$$
+## SOLVING LP MODEL IN R
+
+```{r}
+library(lpSolve)
+
+# Defining the sizes and plants of the weigelt corporation
+sizes <- c("large","medium","small")
+plants <- c("plant1","plant2","plant3")
+
+# The profit per unit for each size of the plant
+
+profit <- c(420, 360, 300)
+
+# The excess production capacity for each plant
+capacity <- c(750, 900, 450)
+
+# The available in-process storage space for each plant
+storage_space <- c(13000, 12000, 5000)
+
+# The space requirement per unit for each size
+space_per_unit <- c(20, 15, 12)
+
+# The sales forecasts for each size
+sales_forecast <- c(900, 1200, 750)
+
+# Objective coefficients
+obj_coef <- c(420, 360, 300, 420, 360, 300,420, 360, 300)
+
+# Constraint matrix (left-hand side)
+const_matrix <- matrix(c(
+  1,1,1,0,0,0,0,0,0, 
+  0,0,0,1,1,1,0,0,0,  
+  0,0,0,0,0,0,1,1,1,  
+  20,15,12,0,0,0,0,0,0, 
+  0,0,0,20,15,12,0,0,0,  
+  0,0,0,0,0,0,20,15,12, 
+  1,0,0,1,0,0,1,0,0, 
+  0,1,0,0,1,0,0,1,0,  
+  0,0,1,0,0,1,0,0,1   
+), nrow = 9, byrow = TRUE)
+
+# Right-hand side of constraints
+rhs <- c(750, 900, 450, 13000, 12000, 5000, 900, 1200, 750)
+
+# Constraint direction (less than or equal)
+const_dir <- rep("<=", 9)
+
+# Solve the linear programming problem
+lp("max", obj_coef, const_matrix, const_dir, rhs)
+
+# Extract the solution
+lp("max", obj_coef, const_matrix, const_dir, rhs)$solution
+```
+
+
+
+
+
